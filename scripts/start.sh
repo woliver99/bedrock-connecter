@@ -216,21 +216,35 @@ EOF
 
     # Initial JAR acquisition if not present
     if [ ! -f "${BC_DIR}/${BC_JAR}" ]; then
-        log_info "Downloading initial BedrockConnect JAR..."
+        log_info "Downloading BedrockConnect JAR..."
         local bc_tag
         bc_tag=$(get_latest_release "Pugmatt/BedrockConnect")
         [ -z "$bc_tag" ] && bc_tag="1.71.0"
         download_file "https://github.com/Pugmatt/BedrockConnect/releases/download/${bc_tag}/${BC_JAR}" "${BC_DIR}/${BC_JAR}"
-        echo "$bc_tag" > "$BC_VER_FILE"
+        if validate_jar "${BC_DIR}/${BC_JAR}"; then
+            echo "$bc_tag" > "$BC_VER_FILE"
+            log_info "BedrockConnect (${bc_tag}) downloaded successfully."
+        else
+            log_error "BedrockConnect download failed validation! Retrying with fallback tag 1.71.0..."
+            download_file "https://github.com/Pugmatt/BedrockConnect/releases/download/1.71.0/${BC_JAR}" "${BC_DIR}/${BC_JAR}"
+            echo "1.71.0" > "$BC_VER_FILE"
+        fi
     fi
 
     if [ ! -f "${XBL_DIR}/${XBL_JAR}" ]; then
-        log_info "Downloading initial MCXboxBroadcast JAR..."
+        log_info "Downloading MCXboxBroadcast JAR..."
         local xbl_tag
         xbl_tag=$(get_latest_release "MCXboxBroadcast/Broadcaster")
         [ -z "$xbl_tag" ] && xbl_tag="159"
         download_file "https://github.com/MCXboxBroadcast/Broadcaster/releases/download/${xbl_tag}/${XBL_JAR}" "${XBL_DIR}/${XBL_JAR}"
-        echo "$xbl_tag" > "$XBL_VER_FILE"
+        if validate_jar "${XBL_DIR}/${XBL_JAR}"; then
+            echo "$xbl_tag" > "$XBL_VER_FILE"
+            log_info "MCXboxBroadcast (${xbl_tag}) downloaded successfully."
+        else
+            log_error "MCXboxBroadcast download failed validation! Retrying with fallback tag 159..."
+            download_file "https://github.com/MCXboxBroadcast/Broadcaster/releases/download/159/${XBL_JAR}" "${XBL_DIR}/${XBL_JAR}"
+            echo "159" > "$XBL_VER_FILE"
+        fi
     fi
 }
 

@@ -20,87 +20,29 @@ with open(os.path.join(DEFAULTS_DIR, "serverlist.json"), "r", encoding="utf-8") 
 with open(os.path.join(DEFAULTS_DIR, "config.yml.template"), "r", encoding="utf-8") as f:
     default_config_yml = f.read()
 
-# Build the embedded installer script
+# Build the embedded instant installer script (zero package managers, zero pre-downloads)
 installer_script = f"""#!/bin/bash
 # ==============================================================================
-# BedrockConnect + MCXboxBroadcast Pterodactyl Installer
+# BedrockConnect + MCXboxBroadcast Instant Installer
 # Container: ghcr.io/pterodactyl/installers:debian
 # Server Mount: /mnt/server
 # ==============================================================================
 set -e
 
 echo "--------------------------------------------------------"
-echo "Installing BedrockConnect + MCXboxBroadcast..."
+echo "Setting up BedrockConnect + MCXboxBroadcast supervisor..."
 echo "--------------------------------------------------------"
-
-apt-get update -y
-apt-get install -y --no-install-recommends curl jq unzip ca-certificates
 
 cd /mnt/server
 
-mkdir -p bedrockconnect broadcaster
-
-# 1. Write startup supervisor script
+# Write the supervisor script directly to server root
 cat << 'STARTSH_EOF' > start.sh
 {start_sh_content}STARTSH_EOF
 chmod +x start.sh
 
-# 2. Seed default BedrockConnect configuration
-if [ ! -f "bedrockconnect/serverlist.json" ]; then
-    echo "Creating default bedrockconnect/serverlist.json..."
-    cat << 'SERVERLIST_EOF' > bedrockconnect/serverlist.json
-{default_serverlist}SERVERLIST_EOF
-fi
-
-if [ ! -f "bedrockconnect/config.yml" ]; then
-    echo "Creating default bedrockconnect/config.yml..."
-    cat << 'BCCONFIG_EOF' > bedrockconnect/config.yml
-db_type: none
-user_servers: true
-server_limit: 100
-featured_servers: true
-kick_inactive: true
-custom_servers: serverlist.json
-BCCONFIG_EOF
-fi
-
-# 3. Seed default MCXboxBroadcast configuration
-if [ ! -f "broadcaster/config.yml" ]; then
-    echo "Creating default broadcaster/config.yml..."
-    cat << 'XBLCONFIG_EOF' > broadcaster/config.yml
-{default_config_yml}XBLCONFIG_EOF
-fi
-
-# 4. Fetch latest release binaries
-BC_JAR="BedrockConnect-1.0-SNAPSHOT.jar"
-XBL_JAR="MCXboxBroadcastStandalone.jar"
-
-echo "Checking latest BedrockConnect release..."
-BC_TAG=""
-BC_LOC=$(curl -sI -m 10 "https://github.com/Pugmatt/BedrockConnect/releases/latest" 2>/dev/null | grep -i "^location:" | tr -d '\\r' | awk '{{print $2}}')
-if [ -n "$BC_LOC" ]; then
-    BC_TAG=$(basename "$BC_LOC")
-fi
-[ -z "$BC_TAG" ] && BC_TAG="1.71.0"
-
-echo "Downloading BedrockConnect ${{BC_TAG}}..."
-curl -sSL -m 120 -o "bedrockconnect/${{BC_JAR}}" "https://github.com/Pugmatt/BedrockConnect/releases/download/${{BC_TAG}}/${{BC_JAR}}"
-echo "$BC_TAG" > .version_bedrockconnect
-
-echo "Checking latest MCXboxBroadcast release..."
-XBL_TAG=""
-XBL_LOC=$(curl -sI -m 10 "https://github.com/MCXboxBroadcast/Broadcaster/releases/latest" 2>/dev/null | grep -i "^location:" | tr -d '\\r' | awk '{{print $2}}')
-if [ -n "$XBL_LOC" ]; then
-    XBL_TAG=$(basename "$XBL_LOC")
-fi
-[ -z "$XBL_TAG" ] && XBL_TAG="159"
-
-echo "Downloading MCXboxBroadcast ${{XBL_TAG}}..."
-curl -sSL -m 120 -o "broadcaster/${{XBL_JAR}}" "https://github.com/MCXboxBroadcast/Broadcaster/releases/download/${{XBL_TAG}}/${{XBL_JAR}}"
-echo "$XBL_TAG" > .version_broadcaster
-
 echo "--------------------------------------------------------"
-echo "Installation completed successfully!"
+echo "Installation completed in < 0.2s!"
+echo "Binaries and configs will be automatically fetched on container start."
 echo "--------------------------------------------------------"
 """
 
@@ -127,7 +69,7 @@ egg_data = {
         "Pterodactyl Java 21": "ghcr.io/pterodactyl/yolks:java_21"
     },
     "file_denylist": [],
-    "startup": "bash start.sh",
+    "startup": "if [ ! -f start.sh ]; then curl -sSL -o start.sh https://raw.githubusercontent.com/woliver99/bedrock-connecter/main/scripts/start.sh && chmod +x start.sh; fi; bash start.sh",
     "config": {
         "files": "{}",
         "startup": json.dumps({"done": "Both BedrockConnect and MCXboxBroadcast are running!"}, indent=4),
