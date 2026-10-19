@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Featured: The Hive",
+    "iconUrl": "",
+    "address": "geo.hivebedrock.network",
+    "port": 19132
+  },
+  {
+    "name": "Featured: CubeCraft",
+    "iconUrl": "",
+    "address": "mco.cubecraft.net",
+    "port": 19132
+  },
+  {
+    "name": "Example: My Dedicated Server",
+    "iconUrl": "",
+    "address": "play.example.com",
+    "port": 19132
+  }
+]

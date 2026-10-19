@@ -1,0 +1,23 @@
+# ==============================================================================
+# BedrockConnect Configuration
+# Official Documentation: https://github.com/Pugmatt/BedrockConnect
+# ==============================================================================
+
+# Database type to store player data: "none", "mysql", "mariadb", or "postgres"
+# Setting to "none" saves player data as local JSON files under the "players" folder
+db_type: none
+
+# Allow players to add and save custom servers to their own menu
+user_servers: true
+
+# Maximum number of servers a player can save
+server_limit: 100
+
+# Toggle display of official featured servers
+featured_servers: true
+
+# Kick idle players after 10 minutes of inactivity in the menu
+kick_inactive: true
+
+# Path to the custom server list visible to all players
+custom_servers: serverlist.json

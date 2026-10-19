@@ -1,0 +1,8 @@
+# Ignore caches and temporary test files
+*.tmp
+*.tmp.jar
+cache/
+players/
+.version_*
+__pycache__/
+*.fifo
