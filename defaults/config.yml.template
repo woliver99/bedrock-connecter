@@ -7,8 +7,8 @@ session:
   # Session update interval in seconds (minimum 20 due to Xbox Live rate limits)
   update-interval: 30
 
-  # Query BedrockConnect to sync session MOTD, player counts, etc.
-  query-server: true
+  # Query BedrockConnect to sync session MOTD, player counts, etc. (disabled for NAT loopback compatibility)
+  query-server: false
 
   # Fallback to checker.geysermc.org if native ping fails (helpful behind NAT/Docker)
   web-query-fallback: true

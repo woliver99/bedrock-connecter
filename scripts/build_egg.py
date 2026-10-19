@@ -57,7 +57,7 @@ egg_data = {
         "and access a custom server list. Features an autonomous background supervisor that monitors process health, "
         "periodically checks for upstream GitHub releases, verifies downloads, and performs zero-maintenance rolling restarts."
     ),
-    "features": None,
+    "image": "ghcr.io/woliver99/bedrock-connecter:latest",
     "docker_images": {
         "BedrockConnect Multi-Arch (ghcr.io)": "ghcr.io/woliver99/bedrock-connecter:latest",
         "Java 21 (Recommended)": "ghcr.io/ptero-eggs/yolks:java_21",

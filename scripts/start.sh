@@ -175,7 +175,7 @@ EOF
 # MCXboxBroadcast Standalone Configuration
 session:
   update-interval: 30
-  query-server: true
+  query-server: false
   web-query-fallback: true
   config-fallback: true
   session-info:
@@ -447,25 +447,40 @@ cleanup() {
 trap cleanup SIGTERM SIGINT SIGHUP
 
 # ------------------------------------------------------------------------------
-# Console Stdin Handler
+# Main Execution Entrypoint
 # ------------------------------------------------------------------------------
-listen_stdin() {
-    while [ "$RUNNING" = true ] && IFS= read -r cmd; do
+log_info "Initializing BedrockConnect + MCXboxBroadcast Environment..."
+init_workspace
+setup_fifos
+
+start_bedrockconnect
+start_broadcaster
+
+# Signal to Wings that the server is successfully running
+sleep 2
+echo "Both BedrockConnect and MCXboxBroadcast are running!"
+
+LAST_CHECK=$(date +%s)
+
+# Supervisor, Stdin & Watchdog Loop
+while [ "$RUNNING" = true ]; do
+    # Listen for console input directly in the main thread with a 3-second timeout
+    if read -t 3 -r cmd; then
         cmd=$(echo "$cmd" | tr -d '\r\n ')
         case "$cmd" in
             stop|exit|end)
-                log_info "Stop command received via console."
+                log_info "Stop command received via console. Initiating clean shutdown..."
                 cleanup
-                ;;
-            update|check-update)
-                log_info "Manual update check triggered via console."
-                check_for_updates
                 ;;
             restart)
                 log_info "Manual restart triggered via console."
                 stop_services
                 start_bedrockconnect
                 start_broadcaster
+                ;;
+            update|check-update)
+                log_info "Manual update check triggered via console."
+                check_for_updates
                 ;;
             status)
                 local bc_st="STOPPED"
@@ -483,31 +498,13 @@ listen_stdin() {
                 echo "Supported commands: stop, restart, update, status, help"
                 ;;
         esac
-    done
-}
-
-# ------------------------------------------------------------------------------
-# Main Execution Entrypoint
-# ------------------------------------------------------------------------------
-log_info "Initializing BedrockConnect + MCXboxBroadcast Environment..."
-init_workspace
-setup_fifos
-
-start_bedrockconnect
-start_broadcaster
-
-# Signal to Wings that the server is successfully running
-sleep 2
-echo "Both BedrockConnect and MCXboxBroadcast are running!"
-
-listen_stdin &
-STDIN_PID=$!
-
-LAST_CHECK=$(date +%s)
-
-# Supervisor & Watchdog Loop
-while [ "$RUNNING" = true ]; do
-    sleep 5
+    else
+        read_rc=$?
+        # If stdin is closed/EOF (read returncode 1), sleep briefly to prevent busy-spinning
+        if [ "$read_rc" -eq 1 ]; then
+            sleep 2
+        fi
+    fi
 
     # Health Check: BedrockConnect
     if [ "$UPDATING" = false ] && ! kill -0 "$BC_PID" 2>/dev/null; then

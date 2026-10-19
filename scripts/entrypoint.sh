@@ -22,10 +22,20 @@ if [ -n "${STARTUP}" ]; then
 elif [ $# -gt 0 ]; then
     STARTUP_CMD="$*"
 else
-    STARTUP_CMD="start.sh"
+    STARTUP_CMD="/usr/local/bin/start.sh"
 fi
 
 PARSED=$(echo "${STARTUP_CMD}" | sed -e 's/{{/${/g' -e 's/}}/}/g' | eval echo "$(cat -)")
+
+# Normalize legacy startup commands ('bash start.sh', './start.sh', or curl bootstrap)
+# directly to embedded /usr/local/bin/start.sh if ./start.sh is absent
+case "${PARSED}" in
+    *"start.sh"*|*"curl -sSL -o start.sh"*)
+        if [ ! -f "./start.sh" ] && [ -x "/usr/local/bin/start.sh" ]; then
+            PARSED="/usr/local/bin/start.sh"
+        fi
+        ;;
+esac
 
 printf "\033[1m\033[33mcontainer@pterodactyl~ \033[0m%s\n" "$PARSED"
 # shellcheck disable=SC2086
