@@ -60,9 +60,10 @@ def validate():
         "curl",
         "unzip",
         "useradd -d /home/container",
-        "COPY --chown=container:container scripts/start.sh",
+        "COPY --chmod=755 scripts/start.sh /usr/local/bin/start.sh",
+        "COPY --chmod=755 scripts/entrypoint.sh /entrypoint.sh",
         "EXPOSE 19132/udp",
-        "CMD [\"/bin/bash\", \"/home/container/start.sh\"]"
+        "ENTRYPOINT [\"/entrypoint.sh\"]"
     ]
     for df_elem in df_required:
         if df_elem not in df_content:

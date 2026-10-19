@@ -21,7 +21,7 @@ with open(os.path.join(DEFAULTS_DIR, "config.yml.template"), "r", encoding="utf-
     default_config_yml = f.read()
 
 # Build the embedded instant installer script (zero package managers, zero pre-downloads)
-installer_script = f"""#!/bin/bash
+installer_script = """#!/bin/bash
 # ==============================================================================
 # BedrockConnect + MCXboxBroadcast Instant Installer
 # Container: ghcr.io/pterodactyl/installers:debian
@@ -30,19 +30,15 @@ installer_script = f"""#!/bin/bash
 set -e
 
 echo "--------------------------------------------------------"
-echo "Setting up BedrockConnect + MCXboxBroadcast supervisor..."
+echo "Initializing BedrockConnect + MCXboxBroadcast environment..."
 echo "--------------------------------------------------------"
 
 cd /mnt/server
 
-# Write the supervisor script directly to server root
-cat << 'STARTSH_EOF' > start.sh
-{start_sh_content}STARTSH_EOF
-chmod +x start.sh
-
 echo "--------------------------------------------------------"
-echo "Installation completed in < 0.2s!"
-echo "Binaries and configs will be automatically fetched on container start."
+echo "Installation completed in < 0.1s!"
+echo "Supervisor and binaries are embedded in the container image."
+echo "Application files and updates are managed on container start."
 echo "--------------------------------------------------------"
 """
 
@@ -63,13 +59,15 @@ egg_data = {
     ),
     "features": None,
     "docker_images": {
-        "Custom GHCR Image (woliver99)": "ghcr.io/woliver99/bedrock-connecter:latest",
+        "BedrockConnect Multi-Arch (ghcr.io)": "ghcr.io/woliver99/bedrock-connecter:latest",
         "Java 21 (Recommended)": "ghcr.io/ptero-eggs/yolks:java_21",
         "Java 17": "ghcr.io/ptero-eggs/yolks:java_17",
         "Pterodactyl Java 21": "ghcr.io/pterodactyl/yolks:java_21"
     },
-    "file_denylist": [],
-    "startup": "if [ ! -f start.sh ]; then curl -sSL -o start.sh https://raw.githubusercontent.com/woliver99/bedrock-connecter/main/scripts/start.sh && chmod +x start.sh; fi; bash start.sh",
+    "file_denylist": [
+        "start.sh"
+    ],
+    "startup": "start.sh",
     "config": {
         "files": "{}",
         "startup": json.dumps({"done": "Both BedrockConnect and MCXboxBroadcast are running!"}, indent=4),
