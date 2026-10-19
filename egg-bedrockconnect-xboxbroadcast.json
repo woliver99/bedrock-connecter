@@ -4,7 +4,7 @@
     "version": "PTDL_v2",
     "update_url": "https://github.com/woliver99/bedrock-connecter/releases/latest/download/egg-bedrockconnect-xboxbroadcast.json"
   },
-  "exported_at": "2026-10-18T22:26:35.471045-04:00",
+  "exported_at": "2026-10-18T22:30:39.396630-04:00",
   "name": "BedrockConnect + MCXboxBroadcast",
   "author": "support@pterodactyl.io",
   "description": "All-in-one low-maintenance Minecraft Bedrock server gateway combining BedrockConnect and MCXboxBroadcast. Allows console players (Xbox, PlayStation, Nintendo Switch) to join custom servers via Xbox Live Friends and access a custom server list. Features an autonomous background supervisor that monitors process health, periodically checks for upstream GitHub releases, verifies downloads, and performs zero-maintenance rolling restarts.",

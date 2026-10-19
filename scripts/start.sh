@@ -175,7 +175,7 @@ EOF
 # MCXboxBroadcast Standalone Configuration
 session:
   update-interval: 30
-  query-server: false
+  query-server: true
   web-query-fallback: true
   config-fallback: true
   session-info:
