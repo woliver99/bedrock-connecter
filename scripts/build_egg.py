@@ -108,7 +108,7 @@ egg_data = {
     "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
     "meta": {
         "version": "PTDL_v2",
-        "update_url": None
+        "update_url": "https://github.com/woliver99/bedrock-connecter/releases/latest/download/egg-bedrockconnect-xboxbroadcast.json"
     },
     "exported_at": datetime.now().astimezone().isoformat(),
     "name": "BedrockConnect + MCXboxBroadcast",
@@ -121,6 +121,7 @@ egg_data = {
     ),
     "features": None,
     "docker_images": {
+        "Custom GHCR Image (woliver99)": "ghcr.io/woliver99/bedrock-connecter:latest",
         "Java 21 (Recommended)": "ghcr.io/ptero-eggs/yolks:java_21",
         "Java 17": "ghcr.io/ptero-eggs/yolks:java_17",
         "Pterodactyl Java 21": "ghcr.io/pterodactyl/yolks:java_21"

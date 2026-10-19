@@ -156,11 +156,42 @@ MCXboxBroadcast must authenticate with Xbox Live to broadcast sessions to friend
 
 ---
 
-## Console Commands
-
-While the server is running, the following commands can be typed into the Pterodactyl Console:
-
 - `status`: Displays current running PIDs and health of BedrockConnect and MCXboxBroadcast.
 - `update`: Manually forces an immediate GitHub update check.
 - `restart`: Gracefully restarts BedrockConnect and MCXboxBroadcast within the container.
 - `stop`: Gracefully stops both services and shuts down the container cleanly.
+
+---
+
+## Automated GitHub Actions & Pterodactyl Egg Auto-Updates
+
+This repository includes a GitHub Actions workflow (`.github/workflows/publish-container-image.yml`) configured for manual dispatch:
+
+1. **GHCR Container Publishing**:
+   - Builds and publishes the multi-arch container image to `ghcr.io/woliver99/bedrock-connecter`.
+   - Includes a `mark_as_latest` toggle to control whether the `:latest` tag is updated.
+2. **Automated GitHub Release with Egg Asset**:
+   - Automatically drafts and publishes a GitHub Release with `egg-bedrockconnect-xboxbroadcast.json` attached as a release asset.
+3. **Pterodactyl / Pelican Panel Auto-Update**:
+   - The egg includes `meta.update_url` set to:
+     ```text
+     https://github.com/woliver99/bedrock-connecter/releases/latest/download/egg-bedrockconnect-xboxbroadcast.json
+     ```
+   - When a new release is published, Pterodactyl and Pelican Panel automatically detect the new egg version and allow 1-click egg updating.
+
+---
+
+## Running Standalone via Docker
+
+You can also run the container directly without Pterodactyl using Docker:
+
+```bash
+docker run -d \
+  --name bedrock-gateway \
+  -p 19132:19132/udp \
+  -v $(pwd)/data:/home/container \
+  -e UPDATE_CHECK_INTERVAL=60 \
+  -e AUTO_UPDATE_RESTART=true \
+  ghcr.io/woliver99/bedrock-connecter:latest
+```
+
